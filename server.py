@@ -29,7 +29,7 @@ class Worker(Thread):
 				os._exit(0) #exits the program				
 			
 			else:
-				reply = '' #any other message
+				reply = 'invalid message\n' #any other message
 			conn.sendall(reply)
 			self.tasks.task_done()
 
