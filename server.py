@@ -8,6 +8,7 @@ HOST = '' #host becomes any address the machine happens to have
 PORT = int(sys.argv[1]) #get the port from the command line arguments and convert to int
 STUDENT_ID = '39e95f0efebef82542626bd6c3c28765726768817d45d38b2d911b26eb5d0b37'
 
+
 class Worker(Thread):
 	"""individual thread that handles the clients requests"""
 	def __init__(self, tasks):
@@ -19,19 +20,20 @@ class Worker(Thread):
 	def run(self):
 		#run forever
 		while True:
-			conn = self.tasks.get() #take a connection from the queue
-			data = conn.recv(2048)
-			if data.startswith("HELO ") :
-				reply = '{}IP:{}\nPort:{}\nStudentID:{}\n'.format(data,my_socket.getsockname()[0],PORT,STUDENT_ID)
-			
-			elif data == "KILL_SERVICE\n" : 
-				my_socket.close()
-				os._exit(0) #exits the program				
-			
-			else:
-				reply = 'invalid message\n' #any other message
-			conn.sendall(reply)
-			self.tasks.task_done()
+		    conn = self.tasks.get() #take a connection from the queue
+		    while True: 
+		        data = conn.recv(2048)
+    			if data == "KILL_SERVICE\n":
+    			    os._exit(0) 
+    			    
+    			elif data.startswith("HELO") and data.endswith("\n"):
+    			    reply = '{}IP:52.30.22.92\nPort:{}\nStudentID:{}\n'.format(data,PORT,STUDENT_ID)
+    			
+    			else:
+    				reply = ''#any other message
+    			
+    			conn.sendall(reply)
+    		self.tasks.task_done()
 
 class ThreadPool:
 	"""pool of worker threads all consuming tasks"""
@@ -56,7 +58,7 @@ except socket.error , msg:
 	print 'binding failed, error: ' + str(msg[0])
 	sys.exit()
 print 'succesful bind'
-my_socket.listen(5)
+my_socket.listen(20)
 print 'listening now'
 
 #init a thread pool:
